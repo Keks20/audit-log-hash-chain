@@ -1,0 +1,70 @@
+# Audit log sa hes lancem: Laravel + MariaDB + phpMyAdmin u Docker-u.
+#
+# Pokretanje (iz ovog foldera):  docker compose up -d --build
+# Aplikacija:                    http://localhost:8081
+# phpMyAdmin:                    http://localhost:8082
+# Baza spolja:                   127.0.0.1, port 3308
+#
+# Portovi su drugaciji od XAMPP-a (80, 3306) i POKSIPP-a (8080, 3307).
+
+name: audit-log
+
+services:
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-audit_root}
+      MARIADB_DATABASE: ${DB_DATABASE:-audit_log}
+      MARIADB_USER: ${DB_USERNAME:-audit}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-audit}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      # 127.0.0.1: baza je dostupna samo sa ovog racunara
+      - "127.0.0.1:3308:3306"
+    volumes:
+      # Podaci baze prezive gasenje kontejnera
+      - db-podaci:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Sve ostalo Laravel cita iz .env. Ovde menjamo samo ono sto je
+      # drugacije unutar Docker-a: baza je kontejner "db" na portu 3306.
+      DB_HOST: db
+      DB_PORT: "3306"
+      APP_URL: http://localhost:8081
+      LOG_CHANNEL: stderr
+    volumes:
+      # Folder projekta = /var/www/app u kontejneru (izmene se vide odmah)
+      - .:/var/www/app
+    ports:
+      - "127.0.0.1:8081:80"
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+    ports:
+      - "127.0.0.1:8082:80"
+
+volumes:
+  db-podaci:
