@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -11,15 +10,14 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Seed the application's database.
+     * Pokrece se sa: php artisan db:seed
+     * Svaki seeder ovde mora smeti da se pokrene vise puta.
+     *
+     * ArtikliIzMagacinaSeeder NIJE ovde: on treba tabelu magacin (uvoz iz .dbf-a),
+     * koje nema posle kloniranja. On ostaje kao zapis kako su podaci nastali.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $this->call(ArtikliSeeder::class);
     }
 }

@@ -1,0 +1,372 @@
+[
+    {
+        "sifra": "001001",
+        "naziv": "Šećer kristal",
+        "jedinica_mere": "kg",
+        "kolicina": "532.572",
+        "cena": "331.68",
+        "datum_nabavke": "1996-11-23",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001002",
+        "naziv": "Brašno T-400",
+        "jedinica_mere": "kg",
+        "kolicina": "708.211",
+        "cena": "755.18",
+        "datum_nabavke": "1997-07-01",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001003",
+        "naziv": "Ulje suncokretovo",
+        "jedinica_mere": "l",
+        "kolicina": "345.920",
+        "cena": "1875.66",
+        "datum_nabavke": "1997-02-06",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001004",
+        "naziv": "Čokolada mlečna 100g",
+        "jedinica_mere": "kom",
+        "kolicina": "487.622",
+        "cena": "514.07",
+        "datum_nabavke": "1997-12-14",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001005",
+        "naziv": "Džem od šljiva",
+        "jedinica_mere": "kom",
+        "kolicina": "25.391",
+        "cena": "1392.35",
+        "datum_nabavke": "1999-02-08",
+        "aktivan": true,
+        "napomena": "Čuvati na suvom i hladnom mestu."
+    },
+    {
+        "sifra": "001006",
+        "naziv": "Kafa mlevena 200g",
+        "jedinica_mere": "kom",
+        "kolicina": "891.749",
+        "cena": "1567.54",
+        "datum_nabavke": "1998-08-05",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001008",
+        "naziv": "Đevrek",
+        "jedinica_mere": "kom",
+        "kolicina": "190.242",
+        "cena": "402.67",
+        "datum_nabavke": "1999-10-20",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001009",
+        "naziv": "Ćuretina file",
+        "jedinica_mere": "kg",
+        "kolicina": "422.421",
+        "cena": "2197.28",
+        "datum_nabavke": "1996-08-04",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001010",
+        "naziv": "Sir gauda",
+        "jedinica_mere": "kg",
+        "kolicina": "291.515",
+        "cena": "129.54",
+        "datum_nabavke": "1995-06-16",
+        "aktivan": false,
+        "napomena": "Akcija do kraja meseca - ćirilica na deklaraciji."
+    },
+    {
+        "sifra": "001011",
+        "naziv": "Mleko 2,8%",
+        "jedinica_mere": "l",
+        "kolicina": "359.858",
+        "cena": "2151.72",
+        "datum_nabavke": "1995-06-25",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001012",
+        "naziv": "Jogurt čaša",
+        "jedinica_mere": "kom",
+        "kolicina": "375.820",
+        "cena": "1155.72",
+        "datum_nabavke": null,
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001013",
+        "naziv": "Pirinač",
+        "jedinica_mere": "kg",
+        "kolicina": "572.954",
+        "cena": "1848.93",
+        "datum_nabavke": "1995-05-09",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001014",
+        "naziv": "Šampon za kosu",
+        "jedinica_mere": "kom",
+        "kolicina": "717.519",
+        "cena": "1630.86",
+        "datum_nabavke": "2000-04-17",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001016",
+        "naziv": "Sapun",
+        "jedinica_mere": "kom",
+        "kolicina": "638.459",
+        "cena": "1500.74",
+        "datum_nabavke": "1996-03-13",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001017",
+        "naziv": "Čaj od nane",
+        "jedinica_mere": "kom",
+        "kolicina": "163.316",
+        "cena": "1427.60",
+        "datum_nabavke": "2000-10-22",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001018",
+        "naziv": "Paprika crvena",
+        "jedinica_mere": "kg",
+        "kolicina": "739.065",
+        "cena": "1011.43",
+        "datum_nabavke": "1999-03-08",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001019",
+        "naziv": "Krompir mladi",
+        "jedinica_mere": "kg",
+        "kolicina": "729.087",
+        "cena": "1696.12",
+        "datum_nabavke": null,
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001020",
+        "naziv": "Luk crni",
+        "jedinica_mere": "kg",
+        "kolicina": "883.331",
+        "cena": "403.23",
+        "datum_nabavke": "1998-04-16",
+        "aktivan": true,
+        "napomena": "Dobavljač kasni sa isporukom.\r\nPozvati u ponedeljak."
+    },
+    {
+        "sifra": "001021",
+        "naziv": "Šećer kristal (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "79.699",
+        "cena": "1597.81",
+        "datum_nabavke": "1996-11-18",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001022",
+        "naziv": "Brašno T-400 (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "503.460",
+        "cena": "1763.42",
+        "datum_nabavke": "1999-05-26",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001023",
+        "naziv": "Ulje suncokretovo (2)",
+        "jedinica_mere": "l",
+        "kolicina": null,
+        "cena": "2111.27",
+        "datum_nabavke": "1995-08-10",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001024",
+        "naziv": "Čokolada mlečna 100g (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "655.382",
+        "cena": "2338.80",
+        "datum_nabavke": "1996-06-08",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001025",
+        "naziv": "Džem od šljiva (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "288.188",
+        "cena": "704.68",
+        "datum_nabavke": "2000-06-01",
+        "aktivan": true,
+        "napomena": "Čuvati na suvom i hladnom mestu."
+    },
+    {
+        "sifra": "001026",
+        "naziv": "Kafa mlevena 200g (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "838.300",
+        "cena": "2068.27",
+        "datum_nabavke": "1998-02-12",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001027",
+        "naziv": "Žvaka 5 kom (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "187.461",
+        "cena": "2291.77",
+        "datum_nabavke": "2000-04-16",
+        "aktivan": null,
+        "napomena": null
+    },
+    {
+        "sifra": "001028",
+        "naziv": "Đevrek (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "445.001",
+        "cena": "1441.58",
+        "datum_nabavke": "1998-06-18",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001029",
+        "naziv": "Ćuretina file (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "548.877",
+        "cena": "2145.54",
+        "datum_nabavke": "1997-11-29",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001030",
+        "naziv": "Sir gauda (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "96.739",
+        "cena": "751.02",
+        "datum_nabavke": "1995-01-19",
+        "aktivan": true,
+        "napomena": "Akcija do kraja meseca - ćirilica na deklaraciji."
+    },
+    {
+        "sifra": "001032",
+        "naziv": "Jogurt čaša (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "633.403",
+        "cena": "1666.76",
+        "datum_nabavke": "1996-09-01",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001033",
+        "naziv": "Pirinač (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "775.449",
+        "cena": null,
+        "datum_nabavke": "1999-01-05",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001034",
+        "naziv": "Šampon za kosu (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "604.680",
+        "cena": "707.03",
+        "datum_nabavke": "1996-05-26",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001035",
+        "naziv": "Deterdžent 3kg (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "464.836",
+        "cena": "2218.04",
+        "datum_nabavke": "2000-01-25",
+        "aktivan": true,
+        "napomena": "Reklamacija: oštećena ambalaža (3 kom)."
+    },
+    {
+        "sifra": "001036",
+        "naziv": "Sapun (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "809.407",
+        "cena": "974.95",
+        "datum_nabavke": "2001-09-15",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001037",
+        "naziv": "Čaj od nane (2)",
+        "jedinica_mere": "kom",
+        "kolicina": "864.283",
+        "cena": "660.41",
+        "datum_nabavke": "1999-10-26",
+        "aktivan": false,
+        "napomena": null
+    },
+    {
+        "sifra": "001038",
+        "naziv": "Paprika crvena (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "482.827",
+        "cena": "221.41",
+        "datum_nabavke": "1995-11-07",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001039",
+        "naziv": "Krompir mladi (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "362.003",
+        "cena": "2484.93",
+        "datum_nabavke": "2000-06-30",
+        "aktivan": true,
+        "napomena": null
+    },
+    {
+        "sifra": "001040",
+        "naziv": "Luk crni (2)",
+        "jedinica_mere": "kg",
+        "kolicina": "671.330",
+        "cena": "1085.13",
+        "datum_nabavke": "1996-11-21",
+        "aktivan": false,
+        "napomena": "Dobavljač kasni sa isporukom.\r\nPozvati u ponedeljak."
+    }
+]

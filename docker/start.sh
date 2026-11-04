@@ -17,4 +17,8 @@ fi
 # Laravelove tabele (users, sessions, cache, jobs) i kasnije nase
 php artisan migrate --force
 
+# Pocetni podaci iz database/data/*.json
+# (seederi preskacu tabele koje vec imaju podatke)
+php artisan db:seed --force
+
 exec apache2-foreground
