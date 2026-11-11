@@ -13,6 +13,9 @@ class Artikal extends Model
     // Laravel bi sam trazio "artikals", zato navodimo tacno ime
     protected $table = 'artikli';
 
+    // Jedinice mere iz starog programa (samo ove postoje u podacima)
+    public const JEDINICE_MERE = ['kg', 'l', 'kom'];
+
     protected $fillable = [
         'sifra',
         'naziv',

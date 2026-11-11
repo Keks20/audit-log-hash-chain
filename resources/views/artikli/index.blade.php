@@ -5,7 +5,12 @@
 @section('sadrzaj')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Artikli</h1>
-        <span class="text-muted">Ukupno: {{ $artikli->count() }}</span>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-muted">Ukupno: {{ $artikli->count() }}</span>
+            @auth
+                <a href="{{ route('artikli.create') }}" class="btn btn-primary btn-sm">Dodaj artikal</a>
+            @endauth
+        </div>
     </div>
 
     <div class="table-responsive">
@@ -20,6 +25,9 @@
                     <th>Datum nabavke</th>
                     <th>Aktivan</th>
                     <th>Napomena</th>
+                    @auth
+                        <th></th>
+                    @endauth
                 </tr>
             </thead>
             <tbody>
@@ -45,10 +53,22 @@
                             @endif
                         </td>
                         <td class="small text-muted">{{ $a->napomena }}</td>
+                        @auth
+                            <td class="text-end text-nowrap">
+                                <a href="{{ route('artikli.edit', $a) }}" class="btn btn-outline-primary btn-sm">Izmeni</a>
+                                {{-- Js::from bezbedno ubacuje tekst u JavaScript (naziv moze imati navodnike) --}}
+                                <form method="POST" action="{{ route('artikli.destroy', $a) }}" class="d-inline"
+                                      onsubmit="return confirm({{ Js::from('Obrisati artikal ' . $a->sifra . ' (' . $a->naziv . ')?') }})">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Obriši</button>
+                                </form>
+                            </td>
+                        @endauth
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-4">
+                        <td colspan="{{ auth()->check() ? 9 : 8 }}" class="text-center text-muted py-4">
                             Nema artikala. Učitaj ih iz <code>database/data/artikli.json</code>:
                             <code>php artisan db:seed</code>
                         </td>
