@@ -49,7 +49,8 @@
                 @empty
                     <tr>
                         <td colspan="8" class="text-center text-muted py-4">
-                            Nema artikala. Pokreni seeder ArtikliIzMagacinaSeeder.
+                            Nema artikala. Učitaj ih iz <code>database/data/artikli.json</code>:
+                            <code>php artisan db:seed</code>
                         </td>
                     </tr>
                 @endforelse
