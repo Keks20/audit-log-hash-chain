@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArtikalController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\PrijavaController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,13 +10,16 @@ Route::redirect('/', '/artikli');
 
 Route::get('/artikli', [ArtikalController::class, 'index'])->name('artikli.index');
 
-// Dodavanje, izmena i brisanje samo za prijavljene
+// Dodavanje, izmena i brisanje, kao i audit log, samo za prijavljene
 Route::middleware('auth')->group(function () {
     Route::get('/artikli/novi', [ArtikalController::class, 'create'])->name('artikli.create');
     Route::post('/artikli', [ArtikalController::class, 'store'])->name('artikli.store');
     Route::get('/artikli/{artikal}/izmena', [ArtikalController::class, 'edit'])->name('artikli.edit');
     Route::put('/artikli/{artikal}', [ArtikalController::class, 'update'])->name('artikli.update');
     Route::delete('/artikli/{artikal}', [ArtikalController::class, 'destroy'])->name('artikli.destroy');
+
+    Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+    Route::get('/audit-log/provera', [AuditLogController::class, 'provera'])->name('audit-log.provera');
 });
 
 // Prijava samo za goste; prijavljenog bootstrap/app.php vraca na listu

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\KanonskiJson;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -40,5 +41,29 @@ class Artikal extends Model
             'datum_nabavke' => 'date',
             'aktivan'       => 'boolean',
         ];
+    }
+
+    /**
+     * Stanje artikla koje ide u audit log: samo poslovna polja, bez id-a
+     * i vremena (created_at/updated_at se menjaju i bez stvarne izmene).
+     * Tipovi su stalni: decimale kao string, datum "Y-m-d", aktivan bool|null.
+     */
+    public function kanonskiPodaci(): array
+    {
+        return [
+            'sifra'         => $this->sifra,
+            'naziv'         => $this->naziv,
+            'jedinica_mere' => $this->jedinica_mere,
+            'kolicina'      => $this->kolicina,
+            'cena'          => $this->cena,
+            'datum_nabavke' => $this->datum_nabavke?->format('Y-m-d'),
+            'aktivan'       => $this->aktivan,
+            'napomena'      => $this->napomena,
+        ];
+    }
+
+    public function kanonskiJson(): string
+    {
+        return KanonskiJson::encode($this->kanonskiPodaci());
     }
 }

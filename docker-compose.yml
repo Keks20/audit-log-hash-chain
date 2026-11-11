@@ -27,6 +27,8 @@ services:
     volumes:
       # Podaci baze prezive gasenje kontejnera
       - db-podaci:/var/lib/mysql
+      # Test baza audit_log_test (radi samo nad praznim volume-om)
+      - ./docker/mariadb-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s

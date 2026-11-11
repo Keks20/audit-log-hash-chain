@@ -17,6 +17,12 @@
                 <a class="nav-link {{ request()->routeIs('artikli.*') ? 'active' : '' }}"
                    href="{{ route('artikli.index') }}">Artikli</a>
             </li>
+            @auth
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('audit-log.*') ? 'active' : '' }}"
+                       href="{{ route('audit-log.index') }}">Audit log</a>
+                </li>
+            @endauth
         </ul>
 
         <div class="ms-auto d-flex align-items-center gap-3">

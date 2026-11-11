@@ -4,9 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ArtikalRequest;
 use App\Models\Artikal;
+use App\Models\AuditZapis;
+use App\Services\AuditLog;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
+/**
+ * Svaka izmena artikla i njen zapis u audit logu idu u istoj transakciji:
+ * ili se upisu oba, ili nijedno.
+ */
 class ArtikalController extends Controller
 {
     /**
@@ -29,9 +37,18 @@ class ArtikalController extends Controller
         return view('artikli.forma', compact('artikal'));
     }
 
-    public function store(ArtikalRequest $request): RedirectResponse
+    public function store(ArtikalRequest $request, AuditLog $log): RedirectResponse
     {
-        $artikal = Artikal::create($request->validated());
+        $artikal = DB::transaction(function () use ($request, $log) {
+            $artikal = Artikal::create($request->validated());
+
+            // U log ide ono sto je stvarno u bazi, ne ono sto je stiglo iz forme
+            $artikal->refresh();
+
+            $log->zapisi(AuditZapis::DODAT, $artikal, null, $artikal->kanonskiPodaci(), $request->user());
+
+            return $artikal;
+        });
 
         return redirect()->route('artikli.index')
             ->with('poruka', "Dodat artikal {$artikal->sifra} ({$artikal->naziv}).");
@@ -42,30 +59,52 @@ class ArtikalController extends Controller
         return view('artikli.forma', compact('artikal'));
     }
 
-    public function update(ArtikalRequest $request, Artikal $artikal): RedirectResponse
+    public function update(ArtikalRequest $request, Artikal $artikal, AuditLog $log): RedirectResponse
     {
-        $artikal->fill($request->validated());
+        $sacuvan = DB::transaction(function () use ($request, $artikal, $log) {
+            // Ponovo citamo artikal pod kljucem, da "pre" bude stvarno stanje
+            // i kad dvoje istovremeno menja isti artikal
+            $zakljucan = Artikal::lockForUpdate()->findOrFail($artikal->id);
+            $pre = $zakljucan->kanonskiPodaci();
 
-        // Cuvanje bez stvarne promene se ne upisuje.
-        // U fazi 2 to znaci i: nema praznog zapisa u audit logu.
-        if (! $artikal->isDirty()) {
+            $zakljucan->fill($request->validated());
+
+            // Cuvanje bez stvarne promene se ne upisuje, pa nema ni praznog zapisa u logu
+            if (! $zakljucan->isDirty()) {
+                return null;
+            }
+
+            $zakljucan->save();
+            $zakljucan->refresh();
+
+            $log->zapisi(AuditZapis::IZMENJEN, $zakljucan, $pre, $zakljucan->kanonskiPodaci(), $request->user());
+
+            return $zakljucan;
+        });
+
+        if ($sacuvan === null) {
             return redirect()->route('artikli.index')
                 ->with('poruka', "Artikal {$artikal->sifra}: nema izmena.");
         }
 
-        $artikal->save();
-
         return redirect()->route('artikli.index')
-            ->with('poruka', "Sačuvan artikal {$artikal->sifra} ({$artikal->naziv}).");
+            ->with('poruka', "Sačuvan artikal {$sacuvan->sifra} ({$sacuvan->naziv}).");
     }
 
     /**
      * Pravo brisanje (ne SoftDeletes). Poslednje stanje artikla
-     * u fazi 2 ostaje zapisano u audit logu.
+     * ostaje zapisano u audit logu ("pre").
      */
-    public function destroy(Artikal $artikal): RedirectResponse
+    public function destroy(Request $request, Artikal $artikal, AuditLog $log): RedirectResponse
     {
-        $artikal->delete();
+        DB::transaction(function () use ($request, $artikal, $log) {
+            $zakljucan = Artikal::lockForUpdate()->findOrFail($artikal->id);
+            $pre = $zakljucan->kanonskiPodaci();
+
+            $zakljucan->delete();
+
+            $log->zapisi(AuditZapis::OBRISAN, $zakljucan, $pre, null, $request->user());
+        });
 
         return redirect()->route('artikli.index')
             ->with('poruka', "Obrisan artikal {$artikal->sifra} ({$artikal->naziv}).");

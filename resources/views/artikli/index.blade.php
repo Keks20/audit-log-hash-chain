@@ -55,6 +55,7 @@
                         <td class="small text-muted">{{ $a->napomena }}</td>
                         @auth
                             <td class="text-end text-nowrap">
+                                <a href="{{ route('audit-log.index', ['artikal' => $a->id]) }}" class="btn btn-outline-secondary btn-sm">Istorija</a>
                                 <a href="{{ route('artikli.edit', $a) }}" class="btn btn-outline-primary btn-sm">Izmeni</a>
                                 {{-- Js::from bezbedno ubacuje tekst u JavaScript (naziv moze imati navodnike) --}}
                                 <form method="POST" action="{{ route('artikli.destroy', $a) }}" class="d-inline"

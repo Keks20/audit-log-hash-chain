@@ -10,4 +10,10 @@ return [
      */
     'demo_lozinka' => env('DEMO_LOZINKA'),
 
+    /*
+     * Sve se cuva u UTC (app.timezone), jer vreme ulazi u hes audit loga.
+     * Ova zona se koristi samo za prikaz i za "danas" pri unosu datuma.
+     */
+    'zona_prikaza' => 'Europe/Belgrade',
+
 ];

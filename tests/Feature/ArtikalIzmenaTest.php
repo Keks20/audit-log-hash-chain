@@ -224,7 +224,7 @@ class ArtikalIzmenaTest extends TestCase
                 'jedinica_mere' => 'tona',
                 'kolicina'      => '-1',
                 'cena'          => '12,345',
-                'datum_nabavke' => now()->addDay()->format('Y-m-d'),
+                'datum_nabavke' => today(config('magacin.zona_prikaza'))->addDay()->format('Y-m-d'),
                 'aktivan'       => 'mozda',
                 'napomena'      => str_repeat('x', 1001),
             ]))

@@ -35,7 +35,12 @@ class ArtikalRequest extends FormRequest
             'jedinica_mere' => ['required', Rule::in(Artikal::JEDINICE_MERE)],
             'kolicina'      => [$this->obavezno('kolicina'), 'numeric', 'decimal:0,3', 'min:0', 'max:9999999.999'],
             'cena'          => [$this->obavezno('cena'), 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
-            'datum_nabavke' => [$this->obavezno('datum_nabavke'), 'date_format:Y-m-d', 'before_or_equal:today'],
+            // "Danas" po nasem vremenu, ne po UTC (inace bi oko ponoci danasnji datum bio "buducnost")
+            'datum_nabavke' => [
+                $this->obavezno('datum_nabavke'),
+                'date_format:Y-m-d',
+                'before_or_equal:' . today(config('magacin.zona_prikaza'))->toDateString(),
+            ],
             'aktivan'       => [$this->obavezno('aktivan'), 'boolean'],
             'napomena'      => ['nullable', 'string', 'max:1000'],
         ];
