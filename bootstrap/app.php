@@ -11,7 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Laravel bi gosta slao na rutu "login", a nasa se zove "prijava"
+        $middleware->redirectGuestsTo(fn () => route('prijava'));
+        $middleware->redirectUsersTo(fn () => route('artikli.index'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

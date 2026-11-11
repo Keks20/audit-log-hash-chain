@@ -18,10 +18,26 @@
                    href="{{ route('artikli.index') }}">Artikli</a>
             </li>
         </ul>
+
+        <div class="ms-auto d-flex align-items-center gap-3">
+            @auth
+                <span class="navbar-text">{{ auth()->user()->name }}</span>
+                <form method="POST" action="{{ route('odjava') }}" class="m-0">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-light btn-sm">Odjava</button>
+                </form>
+            @else
+                <a class="btn btn-outline-light btn-sm" href="{{ route('prijava') }}">Prijava</a>
+            @endauth
+        </div>
     </div>
 </nav>
 
 <main class="container">
+    @if (session('poruka'))
+        <div class="alert alert-success">{{ session('poruka') }}</div>
+    @endif
+
     @yield('sadrzaj')
 </main>
 
