@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(ArtikliSeeder::class);
+        $this->call([
+            KorisniciSeeder::class,
+            ArtikliSeeder::class,
+        ]);
     }
 }
