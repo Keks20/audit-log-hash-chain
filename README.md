@@ -1,58 +1,78 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Audit log sa heš lancem
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel aplikacija za mali magacin u kojoj će svaka izmena artikla biti upisana u audit log zaštićen heš lancem: svaki zapis sadrži heš prethodnog, pa se naknadno menjanje ili brisanje zapisa iz loga otkriva pri proveri lanca.
 
-## About Laravel
+Podaci potiču iz (izmišljenog) starog dBase programa: `magacin.dbf` u kodnoj strani cp852, uvezen alatom iz repoa `legacy-formats-to-mysql` i prebačen u čistu tabelu `artikli`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+> **Status:** faze 0 i 1 su gotove (lista artikala, prijava, dodavanje, izmena i brisanje). Heš lanac je sledeći (faza 2).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tehnologije
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| | |
+|---|---|
+| Backend | PHP 8.5, Laravel 13 |
+| Baza | MariaDB 10.11 |
+| Frontend | Blade + Bootstrap 5.3 (CDN), bez npm-a i Vite-a |
+| Okruženje | Docker Compose: `app` (Apache), `db`, `phpmyadmin` |
+| Testovi | PHPUnit (Feature testovi) |
 
-## Learning Laravel
+## Pokretanje
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Potreban je samo Docker (Docker Desktop na Windows-u).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+git clone https://github.com/Keks20/audit-log-hash-chain.git
+cd audit-log-hash-chain
+docker compose up -d --build
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Prvi start traje nešto duže: kontejner sam pravi `.env` iz `.env.example`, radi `composer install`, generiše ključ, pokreće migracije i puni bazu (37 artikala i dva test naloga).
 
-## Contributing
+| Servis | Adresa |
+|---|---|
+| Aplikacija | http://localhost:8081 |
+| phpMyAdmin | http://localhost:8082 |
+| MariaDB spolja | `127.0.0.1:3308`, baza `audit_log` |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Svi portovi su vezani samo na `127.0.0.1`.
 
-## Code of Conduct
+Kraj rada: `docker compose stop`. Podaci baze ostaju u Docker volume-u.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Test nalozi
 
-## Security Vulnerabilities
+| Uloga | Email |
+|---|---|
+| Magacioner | `magacioner@magacin.test` |
+| Šef | `sef@magacin.test` |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Lozinka za oba naloga je vrednost `DEMO_LOZINKA` iz `.env` (podrazumevano `lozinka`). Ta lozinka, kao i `audit` / `audit` za bazu, postoji samo za lokalni razvoj.
 
-## License
+## Šta aplikacija radi
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **Lista artikala** je javna. Prazne vrednosti iz starog programa prikazuju se kao „—“, a nepoznato stanje „aktivan“ kao „?“.
+- **Prijava i odjava**: posle 5 pogrešnih pokušaja prijava se blokira na minut, a sesija se obnavlja posle prijave i poništava posle odjave.
+- **Dodavanje artikla**: šifra od tačno 6 cifara i jedinstvena, sva polja osim napomene su obavezna.
+- **Izmena artikla**: šifra se ne menja (ona je identitet artikla za audit log), popunjeno polje ne sme da se isprazni, a prazno polje iz starog programa sme da ostane prazno. Čuvanje bez stvarne promene se ne upisuje.
+- **Brisanje artikla** uz potvrdu (pravo brisanje; poslednje stanje će čuvati audit log).
+- Količina i cena primaju decimalni zarez (`120,50`). Poruke su na srpskom.
+
+## Testovi
+
+```
+docker compose exec app php artisan test
+```
+
+Testovi rade nad SQLite bazom u memoriji (`phpunit.xml`), pa nikad ne diraju lokalnu MariaDB bazu.
+
+## Podaci
+
+- `magacin`: sirova tabela uvezena iz `magacin.dbf` (40 zapisa, 3 obrisana u dBase-u). Ne postoji posle kloniranja; nije je napravila migracija.
+- `artikli`: čista tabela aplikacije.
+- `database/data/artikli.json`: 37 artikala u repou. `ArtikliSeeder` iz njega puni samo **praznu** tabelu `artikli`, pa izmene iz aplikacije ostaju. Fajl se pravi komandom `php artisan artikli:izvoz`.
+- `ArtikliIzMagacinaSeeder`: zapis kako su artikli prvobitno prebačeni iz tabele `magacin`.
+
+## Plan
+
+- [x] **Faza 0:** Laravel + Docker, uvoz `magacin.dbf`, tabela `artikli`, lista artikala
+- [x] **Faza 1:** prijava, dodavanje, izmena i brisanje artikla
+- [ ] **Faza 2:** kanonski JSON artikla, audit log tabela, heš svakog zapisa vezan za prethodni, provera integriteta lanca
