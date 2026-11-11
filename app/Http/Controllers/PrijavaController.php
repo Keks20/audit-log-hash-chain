@@ -69,7 +69,7 @@ class PrijavaController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('artikli.index')
+        return redirect()->route('prijava')
             ->with('poruka', 'Uspešna odjava.');
     }
 }

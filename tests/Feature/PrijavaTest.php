@@ -93,14 +93,18 @@ class PrijavaTest extends TestCase
             ->assertRedirect('/artikli');
     }
 
-    public function test_odjava_odjavljuje_korisnika(): void
+    public function test_odjava_vodi_na_prijavu(): void
     {
         $this->actingAs($this->korisnik())
             ->post('/odjava')
-            ->assertRedirect('/artikli')
+            ->assertRedirect('/prijava')
             ->assertSessionHas('poruka', 'Uspešna odjava.');
 
         $this->assertGuest();
+
+        $this->get('/prijava')
+            ->assertOk()
+            ->assertSee('Uspešna odjava.');
     }
 
     public function test_gost_ne_moze_na_odjavu(): void
