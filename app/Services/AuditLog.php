@@ -95,6 +95,16 @@ class AuditLog
      */
     public function proveri(?string $sidro = null): RezultatProvere
     {
+        // Lanac se cita u delovima, a glava posebnim upitom. Bez transakcije bi
+        // upis koji stigne izmedju ta dva citanja pomerio glavu na zapis koji
+        // provera nije videla, pa bi javila "glava se ne slaze" za ispravan lanac.
+        // U transakciji (REPEATABLE READ) svi upiti vide isti snimak baze, a
+        // obicno citanje nista ne zakljucava, pa upisi ne cekaju na proveru.
+        return DB::transaction(fn () => $this->proveriSnimak($sidro));
+    }
+
+    private function proveriSnimak(?string $sidro): RezultatProvere
+    {
         $ocekivaniPrethodni = AuditZapis::POCETNI_HES;
         $broj = 0;
         $poslednjiId = null;
