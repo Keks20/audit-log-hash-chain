@@ -6,7 +6,15 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Artikli</h1>
         <div class="d-flex align-items-center gap-3">
-            <span class="text-muted">Ukupno: {{ $artikli->count() }}</span>
+            <form method="GET" action="{{ route('artikli.index') }}" class="d-flex gap-2" role="search">
+                <input type="search" name="q" value="{{ $q }}" maxlength="50" class="form-control form-control-sm"
+                       placeholder="Šifra ili naziv" aria-label="Pretraga po šifri ili nazivu">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">Traži</button>
+                @if ($q !== '')
+                    <a href="{{ route('artikli.index') }}" class="btn btn-outline-secondary btn-sm">Sve</a>
+                @endif
+            </form>
+            <span class="text-muted text-nowrap">{{ $q !== '' ? 'Nađeno' : 'Ukupno' }}: {{ $artikli->count() }}</span>
             @auth
                 <a href="{{ route('artikli.create') }}" class="btn btn-primary btn-sm">Dodaj artikal</a>
             @endauth
@@ -57,21 +65,27 @@
                             <td class="text-end text-nowrap">
                                 <a href="{{ route('audit-log.index', ['artikal' => $a->id]) }}" class="btn btn-outline-secondary btn-sm">Istorija</a>
                                 <a href="{{ route('artikli.edit', $a) }}" class="btn btn-outline-primary btn-sm">Izmeni</a>
-                                {{-- Js::from bezbedno ubacuje tekst u JavaScript (naziv moze imati navodnike) --}}
-                                <form method="POST" action="{{ route('artikli.destroy', $a) }}" class="d-inline"
-                                      onsubmit="return confirm({{ Js::from('Obrisati artikal ' . $a->sifra . ' (' . $a->naziv . ')?') }})">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">Obriši</button>
-                                </form>
+                                @can('sef')
+                                    {{-- Js::from bezbedno ubacuje tekst u JavaScript (naziv moze imati navodnike) --}}
+                                    <form method="POST" action="{{ route('artikli.destroy', $a) }}" class="d-inline"
+                                          onsubmit="return confirm({{ Js::from('Obrisati artikal ' . $a->sifra . ' (' . $a->naziv . ')?') }})">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Obriši</button>
+                                    </form>
+                                @endcan
                             </td>
                         @endauth
                     </tr>
                 @empty
                     <tr>
                         <td colspan="{{ auth()->check() ? 9 : 8 }}" class="text-center text-muted py-4">
-                            Nema artikala. Učitaj ih iz <code>database/data/artikli.json</code>:
-                            <code>php artisan db:seed</code>
+                            @if ($q !== '')
+                                Nijedan artikal ne odgovara pretrazi „{{ $q }}“.
+                            @else
+                                Nema artikala. Učitaj ih iz <code>database/data/artikli.json</code>:
+                                <code>php artisan db:seed</code>
+                            @endif
                         </td>
                     </tr>
                 @endforelse

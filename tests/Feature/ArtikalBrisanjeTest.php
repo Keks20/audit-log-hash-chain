@@ -39,7 +39,7 @@ class ArtikalBrisanjeTest extends TestCase
         $a = $this->artikal();
         $drugi = $this->artikal('001002', 'Brašno T-400');
 
-        $this->actingAs(User::factory()->create())
+        $this->actingAs(User::factory()->sef()->create())
             ->delete("/artikli/{$a->id}")
             ->assertRedirect('/artikli')
             ->assertSessionHas('poruka', 'Obrisan artikal 001001 (Šećer kristal).');
@@ -51,7 +51,7 @@ class ArtikalBrisanjeTest extends TestCase
 
     public function test_brisanje_nepostojeceg_artikla_vraca_404(): void
     {
-        $this->actingAs(User::factory()->create())
+        $this->actingAs(User::factory()->sef()->create())
             ->delete('/artikli/999')
             ->assertNotFound();
     }
@@ -59,7 +59,7 @@ class ArtikalBrisanjeTest extends TestCase
     public function test_obrisana_sifra_moze_ponovo_da_se_koristi(): void
     {
         $a = $this->artikal();
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->sef()->create());
 
         $this->delete("/artikli/{$a->id}");
 
@@ -82,7 +82,7 @@ class ArtikalBrisanjeTest extends TestCase
 
         $this->get('/artikli')->assertDontSee('Obriši');
 
-        $html = $this->actingAs(User::factory()->create())
+        $html = $this->actingAs(User::factory()->sef()->create())
             ->get('/artikli')
             ->assertSee('Obriši')
             ->getContent();

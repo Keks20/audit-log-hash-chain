@@ -56,7 +56,8 @@ class DijagnostikaLanca
         $posle = $this->stanje($red->posle, 'posle', $tragovi);
 
         $akcijaOdgovara = match ($red->akcija) {
-            AuditZapis::DODAT    => $red->pre === null && $red->posle !== null,
+            AuditZapis::DODAT,
+            AuditZapis::POCETNO  => $red->pre === null && $red->posle !== null,
             AuditZapis::IZMENJEN => $red->pre !== null && $red->posle !== null,
             AuditZapis::OBRISAN  => $red->pre !== null && $red->posle === null,
             default              => false,
@@ -183,6 +184,37 @@ class DijagnostikaLanca
             $uGlavi < $stvarno            => ["Glava pokazuje na zapis #{$uGlavi}, a postoje zapisi do #{$stvarno}: dodati su mimo aplikacije ili je glava vraćena unazad."],
             default                       => ["Glava i poslednji zapis #{$stvarno} imaju isti id, ali različit heš: izmenjena je glava ili poslednji zapis."],
         };
+    }
+
+    /**
+     * Artikal u tabeli prema svom poslednjem zapisu u logu.
+     *
+     * @return string[]
+     */
+    public function stanjeArtikla(Artikal $artikal, ?object $zapis): array
+    {
+        if ($zapis === null) {
+            return ["Artikal {$artikal->sifra} nema nijedan zapis u logu: dodat je mimo aplikacije, "
+                . 'ili još nije napravljen početni snimak (php artisan audit:snimak).'];
+        }
+
+        if ($zapis->akcija === AuditZapis::OBRISAN) {
+            return ["Artikal {$artikal->sifra} postoji u tabeli artikli, a poslednji zapis #{$zapis->id} u logu kaže da je obrisan."];
+        }
+
+        if ($zapis->posle === $artikal->kanonskiJson()) {
+            return [];
+        }
+
+        $uLogu = $this->stanje($zapis->posle, null);
+        $tragovi = [];
+
+        foreach ($this->razlike($artikal->kanonskiPodaci(), is_array($uLogu) ? $uLogu : []) as $polje => [$uTabeli, $poLogu]) {
+            $tragovi[] = "Artikal {$artikal->sifra}: polje „{$polje}“ u tabeli je „{$uTabeli}“, "
+                . "a poslednji zapis #{$zapis->id} u logu kaže „{$poLogu}“ (izmena mimo aplikacije).";
+        }
+
+        return $tragovi;
     }
 
     private function susedZaArtikal(object $red, string $smer): ?object

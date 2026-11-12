@@ -24,7 +24,7 @@ class AuditLogUpisTest extends TestCase
     {
         parent::setUp();
 
-        $this->korisnik = User::factory()->create(['email' => 'magacioner@magacin.test']);
+        $this->korisnik = User::factory()->sef()->create(['email' => 'sef@magacin.test']);
         $this->actingAs($this->korisnik);
     }
 
@@ -84,7 +84,7 @@ class AuditLogUpisTest extends TestCase
         $this->assertNull($z->pre);
         $this->assertSame($a->kanonskiJson(), $z->posle);
         $this->assertSame($this->korisnik->id, $z->korisnik_id);
-        $this->assertSame('magacioner@magacin.test', $z->korisnik_email);
+        $this->assertSame('sef@magacin.test', $z->korisnik_email);
         $this->assertSame(AuditZapis::POCETNI_HES, $z->prethodni_hes);
         $this->assertSame(64, strlen(AuditZapis::POCETNI_HES));
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $z->hes);
@@ -276,7 +276,7 @@ class AuditLogUpisTest extends TestCase
         $this->korisnik->delete();
 
         $z = AuditZapis::sole();
-        $this->assertSame('magacioner@magacin.test', $z->korisnik_email);
+        $this->assertSame('sef@magacin.test', $z->korisnik_email);
         $this->assertTrue(app(AuditLog::class)->proveri()->ispravan);
     }
 }

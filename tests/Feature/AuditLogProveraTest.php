@@ -6,6 +6,7 @@ use App\Models\Artikal;
 use App\Models\AuditZapis;
 use App\Models\User;
 use App\Services\AuditLog;
+use App\Services\PotpisZapisa;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -275,13 +276,10 @@ class AuditLogProveraTest extends TestCase
         $this->assertStringContainsString('Sidro nije pronađeno', $r->poruka);
     }
 
-    public function test_ponovo_izracunat_lanac_otkriva_tek_sidro(): void
+    // Napadac menja zapis i ponovo racuna heseve svih zapisa posle njega.
+    // Sa tajnim kljucem (pristup i serveru, ne samo bazi) ih i ponovo potpisuje.
+    private function ponovoIzracunajLanac(bool $saKljucem): void
     {
-        $this->napraviLanac();
-        $sidro = $this->log->proveri()->poslednjiHes;
-        $this->ukloniTrigere();
-
-        // Napadac menja zapis i ponovo racuna heseve svih zapisa posle njega
         $this->zameniUPosle($this->id[1], 'Šećer kristal', 'Šećer lažni');
 
         $prethodni = DB::table('audit_log')->where('id', $this->id[0])->value('hes');
@@ -289,12 +287,41 @@ class AuditLogProveraTest extends TestCase
             $red = (array) DB::table('audit_log')->where('id', $id)->first();
             $red['prethodni_hes'] = $prethodni;
             $red['hes'] = AuditLog::hes($red);
-            $this->izmeniUBazi($id, ['prethodni_hes' => $red['prethodni_hes'], 'hes' => $red['hes']]);
+
+            $kolone = ['prethodni_hes' => $red['prethodni_hes'], 'hes' => $red['hes']];
+            if ($saKljucem) {
+                $kolone['potpis'] = (new PotpisZapisa())->potpisi($red['hes']);
+            }
+
+            $this->izmeniUBazi($id, $kolone);
             $prethodni = $red['hes'];
         }
         $this->postaviGlavu($this->id[3]);
+    }
 
-        // Ogranicenje samog lanca: ponovo izracunat lanac (sa glavom) izgleda ispravno
+    public function test_ponovo_izracunat_lanac_bez_kljuca_otkriva_potpis(): void
+    {
+        $this->napraviLanac();
+        $this->ukloniTrigere();
+
+        $this->ponovoIzracunajLanac(saKljucem: false);
+
+        // Hesevi i glava se slazu, ali stari potpis ne odgovara novom hesu
+        $r = $this->log->proveri();
+        $this->assertFalse($r->ispravan);
+        $this->assertSame($this->id[1], $r->losZapisId);
+        $this->assertStringContainsString('Potpis zapisa ne odgovara ključu', $r->poruka);
+    }
+
+    public function test_ponovo_izracunat_i_potpisan_lanac_otkriva_tek_sidro(): void
+    {
+        $this->napraviLanac();
+        $sidro = $this->log->proveri()->poslednjiHes;
+        $this->ukloniTrigere();
+
+        $this->ponovoIzracunajLanac(saKljucem: true);
+
+        // Ogranicenje: ko ima i bazu i kljuc pravi lanac koji izgleda ispravno
         $this->assertTrue($this->log->proveri()->ispravan);
 
         // Sidro sacuvano ranije to otkriva

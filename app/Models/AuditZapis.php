@@ -15,6 +15,9 @@ class AuditZapis extends Model
     public const IZMENJEN = 'izmenjen';
     public const OBRISAN = 'obrisan';
 
+    // Pocetni snimak artikla koji je u tabeli bio pre prvog zapisa (seeder), bez korisnika
+    public const POCETNO = 'pocetno';
+
     // "Prethodni hes" prvog zapisa u lancu
     public const POCETNI_HES = '0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -33,6 +36,7 @@ class AuditZapis extends Model
         'vreme',
         'prethodni_hes',
         'hes',
+        'potpis',
     ];
 
     protected function casts(): array

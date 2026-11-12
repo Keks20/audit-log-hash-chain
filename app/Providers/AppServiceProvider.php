@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,5 +24,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Linkovi za stranice u Bootstrap 5 obliku (Laravel podrazumeva Tailwind)
         Paginator::useBootstrapFive();
+
+        // Brisanje artikla i vracanje stanja iz loga: samo sef (rute: can:sef, pogledi: @can('sef'))
+        Gate::define('sef', fn (User $korisnik) => $korisnik->jeSef());
     }
 }

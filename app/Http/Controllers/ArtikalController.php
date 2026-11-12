@@ -8,6 +8,7 @@ use App\Models\AuditZapis;
 use App\Services\AuditLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -18,13 +19,24 @@ use Illuminate\View\View;
 class ArtikalController extends Controller
 {
     /**
-     * Lista svih artikala, sortirano po sifri.
+     * Lista artikala, sortirano po sifri. ?q= trazi po sifri ili nazivu.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $artikli = Artikal::orderBy('sifra')->get();
+        // ?q[]=... je niz, a ne tekst: tretira se kao da pretrage nema
+        $q = is_string($v = $request->query('q')) ? trim($v) : '';
 
-        return view('artikli.index', compact('artikli'));
+        // % i _ iz pretrage su obican tekst, ne dzokeri
+        $uzorak = '%' . addcslashes($q, '%_\\') . '%';
+
+        $artikli = Artikal::query()
+            ->when($q !== '', fn ($upit) => $upit->where(fn ($u) => $u
+                ->where('sifra', 'like', $uzorak)
+                ->orWhere('naziv', 'like', $uzorak)))
+            ->orderBy('sifra')
+            ->get();
+
+        return view('artikli.index', compact('artikli', 'q'));
     }
 
     /**
@@ -108,5 +120,65 @@ class ArtikalController extends Controller
 
         return redirect()->route('artikli.index')
             ->with('poruka', "Obrisan artikal {$artikal->sifra} ({$artikal->naziv}).");
+    }
+
+    /**
+     * Vraca artikal na stanje iz zapisa loga ("posle", a kod zapisa o brisanju "pre").
+     *
+     * Ide istim putem kao svaka druga izmena, pa i vracanje ostavlja zapis:
+     * postojeci artikal se menja ("izmenjen"), a obrisan se dodaje ponovo
+     * ("dodat", sa novim id-jem). Log se pri tome samo dopisuje.
+     */
+    public function vrati(Request $request, AuditZapis $zapis, AuditLog $log): RedirectResponse
+    {
+        $nazad = redirect()->route('audit-log.index', ['artikal' => $zapis->artikal_id]);
+
+        // Stanje se cita iz loga, pa zapis prvo mora da ima ispravan hes i potpis.
+        // Ovo je provera jednog zapisa; ceo lanac proverava "Proveri lanac".
+        if (! $log->zapisJeNetaknut($zapis->id)) {
+            return $nazad->with('greska', "Zapis #{$zapis->id} ne prolazi proveru (heš ili potpis), stanje iz njega se ne vraća.");
+        }
+
+        $stanje = $zapis->posleNiz() ?? $zapis->preNiz();
+
+        [$ishod, $artikal] = DB::transaction(function () use ($request, $zapis, $stanje, $log) {
+            $postojeci = Artikal::lockForUpdate()->find($zapis->artikal_id);
+
+            if ($postojeci !== null) {
+                $pre = $postojeci->kanonskiPodaci();
+                $postojeci->fill(Arr::except($stanje, 'sifra'));
+
+                if (! $postojeci->isDirty()) {
+                    return ['isto', $postojeci];
+                }
+
+                $postojeci->save();
+                $postojeci->refresh();
+
+                $log->zapisi(AuditZapis::IZMENJEN, $postojeci, $pre, $postojeci->kanonskiPodaci(), $request->user());
+
+                return ['vracen', $postojeci];
+            }
+
+            // Artikal je obrisan. Sifru je u medjuvremenu mogao da dobije drugi artikal.
+            if (Artikal::where('sifra', $stanje['sifra'])->exists()) {
+                return ['zauzeta', null];
+            }
+
+            $novi = Artikal::create($stanje);
+            $novi->refresh();
+
+            $log->zapisi(AuditZapis::DODAT, $novi, null, $novi->kanonskiPodaci(), $request->user());
+
+            return ['dodat', $novi];
+        });
+
+        return match ($ishod) {
+            'isto'    => $nazad->with('poruka', "Artikal {$artikal->sifra} je već u stanju iz zapisa #{$zapis->id}: nema izmena."),
+            'vracen'  => $nazad->with('poruka', "Artikal {$artikal->sifra} je vraćen na stanje iz zapisa #{$zapis->id}."),
+            'zauzeta' => $nazad->with('greska', "Šifru {$zapis->sifra} sada ima drugi artikal, pa obrisani artikal ne može da se vrati."),
+            'dodat'   => redirect()->route('audit-log.index', ['artikal' => $artikal->id])
+                ->with('poruka', "Obrisani artikal {$artikal->sifra} je ponovo dodat sa stanjem iz zapisa #{$zapis->id}."),
+        };
     }
 }

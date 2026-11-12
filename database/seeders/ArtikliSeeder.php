@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Services\AuditLog;
+use App\Services\PotpisZapisa;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -12,6 +14,9 @@ use Illuminate\Support\Facades\File;
  * (Pokrece se pri svakom startu kontejnera preko docker/start.sh.)
  *
  * Fajl artikli.json se pravi komandom: php artisan artikli:izvoz
+ *
+ * Posle unosa upisuje pocetni snimak u audit log (akcija "pocetno", bez
+ * korisnika), da provera ima sa cim da poredi i artikle koji nikad nisu menjani.
  */
 class ArtikliSeeder extends Seeder
 {
@@ -48,5 +53,13 @@ class ArtikliSeeder extends Seeder
         DB::table('artikli')->insert($redovi);
 
         $this->command->info('Uneto artikala iz JSON-a: ' . count($redovi));
+
+        // Bez kljuca za potpis log ne prima upis; start kontejnera zbog toga ne sme da padne
+        if (! app(PotpisZapisa::class)->imaKljuc()) {
+            $this->command->error('Nema AUDIT_KLJUC_POTPISA u .env, početni snimak nije upisan (php artisan audit:kljuc, pa audit:snimak).');
+            return;
+        }
+
+        $this->command->info('Početni snimak u audit logu: ' . app(AuditLog::class)->pocetniSnimak());
     }
 }

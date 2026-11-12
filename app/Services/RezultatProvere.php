@@ -15,7 +15,17 @@ final readonly class RezultatProvere
         public ?int $poslednjiId = null,
         public ?string $poslednjiHes = null, // "sidro" koje vredi sacuvati van baze
         public array $tragovi = [],          // sta se ne slaze (DijagnostikaLanca)
+        public int $nepotpisanih = 0,        // zapisi sa pocetka lanca, iz vremena pre potpisa
+        public array $neslaganja = [],       // tabela artikli se ne slaze sa logom
     ) {}
+
+    /**
+     * Lanac je ispravan i artikli se slazu sa logom.
+     */
+    public function sveURedu(): bool
+    {
+        return $this->ispravan && $this->neslaganja === [];
+    }
 
     public function toArray(): array
     {

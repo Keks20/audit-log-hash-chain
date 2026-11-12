@@ -16,4 +16,18 @@ return [
      */
     'zona_prikaza' => 'Europe/Belgrade',
 
+    /*
+     * Tajni kljuc (Ed25519, base64) kojim se potpisuje svaki zapis audit loga.
+     * Pravi ga: php artisan audit:kljuc
+     * Stoji samo u .env, van baze: ko ima pristup samo bazi ne moze da dopise
+     * ni da ponovo izracuna zapis sa ispravnim potpisom.
+     */
+    'kljuc_potpisa' => env('AUDIT_KLJUC_POTPISA'),
+
+    /*
+     * Fajl u koji "audit:provera --sacuvaj" dopisuje sidra (poslednji hes).
+     * Namerno van baze. Jos bolje je da se kopija cuva i van ovog racunara.
+     */
+    'fajl_sidra' => env('AUDIT_FAJL_SIDRA', storage_path('app/private/sidra.jsonl')),
+
 ];

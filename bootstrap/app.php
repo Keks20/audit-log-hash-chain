@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\BezbednosnaZaglavlja;
 use App\Http\Middleware\OdbijNeispravanUtf8;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Pre StartSession: neispravan UTF-8 ne sme da stigne do sesije (vidi middleware)
         $middleware->web(prepend: [OdbijNeispravanUtf8::class]);
+
+        // Globalno, ne u "web" grupi: Laravel "auth" po prioritetu stavlja ispred
+        // dodatih middleware-a grupe, pa preusmerenje gosta ne bi dobilo zaglavlja
+        $middleware->append(BezbednosnaZaglavlja::class);
 
         // Laravel bi gosta slao na rutu "login", a nasa se zove "prijava"
         $middleware->redirectGuestsTo(fn () => route('prijava'));

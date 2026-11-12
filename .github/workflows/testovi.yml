@@ -1,0 +1,45 @@
+# Isto sto i test kloniranja: cist klon, docker compose, ceo paket testova.
+name: Testovi
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testovi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Na Linux-u povezani folder zadrzava vlasnika sa domacina, a Apache radi
+      # kao www-data i mora da pise u storage (kompajlirani pogledi, fajl sidara).
+      # Docker Desktop na Windows-u ovo ne trazi.
+      - name: Prava upisa za storage
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Pokretanje (build, composer install, kljucevi, migracije, seederi)
+        run: docker compose up -d --build
+
+      - name: Cekanje da aplikacija odgovori
+        run: |
+          for i in $(seq 1 90); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8081/artikli)" = "200" ]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker compose logs app
+          exit 1
+
+      - name: Testovi
+        run: docker compose exec -T app php artisan test
+
+      - name: Provera lanca u svezoj bazi (37 pocetnih zapisa)
+        run: docker compose exec -T app php artisan audit:provera
+
+      - name: Logovi kad nesto padne
+        if: failure()
+        run: docker compose logs
